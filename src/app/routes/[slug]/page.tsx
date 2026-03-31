@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getRouteBySlug, getRoutes } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -41,8 +42,23 @@ export default async function RoutePage({
   const allRoutes = await getRoutes();
   const otherRoutes = allRoutes.filter((r) => r.id !== route.id).slice(0, 3);
 
+  const routeLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: route.name,
+    description: route.shortDescription,
+    touristType: "Джиппинг",
+    offers: {
+      "@type": "Offer",
+      price: route.price,
+      priceCurrency: "RUB",
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
     <main className="pt-20">
+      <JsonLd data={routeLd} />
       {/* Breadcrumb */}
       <div className="bg-bg-secondary border-b border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">

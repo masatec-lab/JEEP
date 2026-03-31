@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getBlogPostBySlug } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -30,8 +31,19 @@ export default async function BlogPostPage({
 
   if (!post || !post.published) notFound();
 
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    author: { "@type": "Organization", name: post.author },
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+  };
+
   return (
     <main className="pt-20">
+      <JsonLd data={articleLd} />
       {/* Breadcrumb */}
       <div className="bg-bg-secondary border-b border-border">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
