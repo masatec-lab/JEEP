@@ -1,9 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeProvider";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Render a placeholder with same dimensions to avoid layout shift & hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="h-9 w-9 rounded-lg border border-border bg-bg-secondary" />
+    );
+  }
 
   return (
     <button
