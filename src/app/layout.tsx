@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MessengerWidgetWrapper from "@/components/MessengerWidgetWrapper";
+import ThemeProvider from "@/components/ThemeProvider";
 import { getContacts } from "@/lib/data";
 import "./globals.css";
 
@@ -48,12 +49,21 @@ export default async function RootLayout({
   const contacts = await getContacts();
 
   return (
-    <html lang="ru" className={`${montserrat.variable} h-full antialiased`}>
+    <html lang="ru" className={`${montserrat.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){var p=window.location.pathname;document.documentElement.classList.add(p.startsWith('/admin')?'light-admin':'light')}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <Header />
-        {children}
-        <Footer />
-        <MessengerWidgetWrapper contacts={contacts} />
+        <ThemeProvider>
+          <Header />
+          {children}
+          <Footer />
+          <MessengerWidgetWrapper contacts={contacts} />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark theme (default) */
 :root {
   --color-bg-primary: #0A0A0A;
   --color-bg-secondary: #1A1A1A;
@@ -14,6 +15,38 @@
   --color-text-secondary: #A0998E;
   --color-text-muted: #6B6560;
   --color-border: #2A2A2A;
+}
+
+/* Light theme — public pages (warm/natural) */
+html.light {
+  --color-bg-primary: #FAF8F5;
+  --color-bg-secondary: #F0EDE8;
+  --color-bg-tertiary: #E5E0D8;
+  --color-accent: #B8922E;
+  --color-accent-hover: #A07D1F;
+  --color-green: #3D6B4C;
+  --color-green-hover: #2E5A3C;
+  --color-terracotta: #B5502A;
+  --color-text-primary: #2C2417;
+  --color-text-secondary: #6B5D4F;
+  --color-text-muted: #9A8E80;
+  --color-border: #D8D0C4;
+}
+
+/* Light theme — admin pages (cool Apple) */
+html.light-admin {
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F5F5F7;
+  --color-bg-tertiary: #E8E8ED;
+  --color-accent: #C49A3C;
+  --color-accent-hover: #A88230;
+  --color-green: #3A6B49;
+  --color-green-hover: #2D5A3B;
+  --color-terracotta: #B5502A;
+  --color-text-primary: #1D1D1F;
+  --color-text-secondary: #6E6E73;
+  --color-text-muted: #A1A1A6;
+  --color-border: #D2D2D7;
 }
 
 @theme inline {
@@ -36,6 +69,7 @@ body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans), system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Smooth scroll */

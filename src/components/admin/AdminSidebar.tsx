@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import ThemeToggle from "../ThemeToggle";
 
 const navItems = [
   {
@@ -126,6 +127,10 @@ export default function AdminSidebar() {
 
       {/* Footer */}
       <div className="border-t border-border p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <span className="text-xs text-text-muted">Тема</span>
+        </div>
         <Link
           href="/"
           target="_blank"

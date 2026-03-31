@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { href: "/routes", label: "Маршруты" },
@@ -62,6 +63,7 @@ export default function Header() {
             >
               +7 (999) 123-45-67
             </a>
+            <ThemeToggle />
             <Link
               href="/contacts#booking"
               className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-bg-primary hover:bg-accent-hover transition-colors"
@@ -119,6 +121,10 @@ export default function Header() {
             >
               +7 (999) 123-45-67
             </a>
+            <div className="flex items-center gap-3 py-2">
+              <ThemeToggle />
+              <span className="text-sm text-text-muted">Сменить тему</span>
+            </div>
             <Link
               href="/contacts#booking"
               onClick={() => setMobileMenuOpen(false)}
