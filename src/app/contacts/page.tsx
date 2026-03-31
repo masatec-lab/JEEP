@@ -101,6 +101,20 @@ export default function ContactsPage() {
                       <div className="text-xs text-text-muted">@jeepping_travel</div>
                     </div>
                   </a>
+                  <a
+                    href="https://max.ru/jeepping_travel"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl border border-border bg-bg-secondary p-4 hover:border-[#FF6600]/50 transition-colors group"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FF6600]/10 text-[#FF6600] group-hover:bg-[#FF6600] group-hover:text-white transition-colors">
+                      <span className="text-sm font-bold">M</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-text-primary">Max</div>
+                      <div className="text-xs text-text-muted">Напишите в Max</div>
+                    </div>
+                  </a>
                 </div>
               </div>
 
