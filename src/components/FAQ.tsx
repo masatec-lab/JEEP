@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { faq } from "@/data/faq";
 import SectionHeading from "./SectionHeading";
 
-export default function FAQ() {
+interface FAQItemData {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export default function FAQ({ items: faq }: { items: FAQItemData[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggle = (index: number) => {

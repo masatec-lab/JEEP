@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function CTABlock() {
+export default function CTABlock({ contacts }: { contacts: Record<string, string> }) {
   return (
     <section className="py-20 sm:py-28 bg-bg-secondary">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,7 +26,7 @@ export default function CTABlock() {
                 Оставить заявку
               </Link>
               <a
-                href="https://wa.me/79991234567"
+                href={contacts.whatsapp || "https://wa.me/79991234567"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-green px-10 py-4 text-base font-semibold text-green hover:bg-green hover:text-white transition-all"
@@ -41,10 +41,10 @@ export default function CTABlock() {
             <p className="mt-8 text-sm text-text-muted">
               Или позвоните:{" "}
               <a
-                href="tel:+79991234567"
+                href={`tel:${contacts.phone_raw || "+79991234567"}`}
                 className="font-semibold text-accent hover:text-accent-hover transition-colors"
               >
-                +7 (999) 123-45-67
+                {contacts.phone || "+7 (999) 123-45-67"}
               </a>
             </p>
           </div>

@@ -1,8 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { reviews } from "@/data/reviews";
 import SectionHeading from "./SectionHeading";
+
+interface ReviewData {
+  id: string;
+  name: string;
+  date: string;
+  rating: number;
+  text: string;
+  route: string;
+}
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -21,7 +29,7 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export default function Reviews() {
+export default function Reviews({ reviews }: { reviews: ReviewData[] }) {
   const [active, setActive] = useState(0);
 
   const goTo = (index: number) => setActive(index);

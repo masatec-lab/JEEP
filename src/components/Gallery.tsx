@@ -1,18 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import SectionHeading from "./SectionHeading";
 
-const galleryItems = [
-  { id: 1, alt: "Горные дороги Адыгеи", span: "col-span-2 row-span-2" },
-  { id: 2, alt: "Водопады Адыгеи", span: "" },
-  { id: 3, alt: "УАЗ на горной тропе", span: "" },
-  { id: 4, alt: "Панорама Лаго-Наки", span: "" },
-  { id: 5, alt: "Гуамское ущелье", span: "col-span-2" },
-  { id: 6, alt: "Скала Чёртов палец", span: "" },
-  { id: 7, alt: "Горная река", span: "" },
-  { id: 8, alt: "Команда на маршруте", span: "col-span-2" },
-];
+interface GalleryItemData {
+  id: string;
+  image: string;
+  alt: string;
+  span: string;
+}
 
 const gradients = [
   "from-[#1a3a2a] via-[#0d1f2d] to-[#1a1a1a]",
@@ -25,7 +22,7 @@ const gradients = [
   "from-[#2a1a2a] via-[#1a2a0d] to-[#1a1a1a]",
 ];
 
-export default function Gallery() {
+export default function Gallery({ items: galleryItems }: { items: GalleryItemData[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const openLightbox = (index: number) => setLightboxIndex(index);

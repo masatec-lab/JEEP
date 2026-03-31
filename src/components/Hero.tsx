@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function Hero() {
+export default function Hero({ contacts }: { contacts: Record<string, string> }) {
   const [offsetY, setOffsetY] = useState(0);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function Hero() {
             Выбрать маршрут
           </Link>
           <a
-            href="tel:+79991234567"
+            href={`tel:${contacts.phone_raw || "+79991234567"}`}
             className="w-full sm:w-auto rounded-full border border-text-primary/20 px-8 py-4 text-base font-semibold text-text-primary hover:border-accent hover:text-accent transition-all"
           >
             Позвонить нам

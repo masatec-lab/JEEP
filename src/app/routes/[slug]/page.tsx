@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { routes, getRouteBySlug } from "@/data/routes";
+import { getRouteBySlug, getRoutes } from "@/lib/data";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 const difficultyColors: Record<number, string> = {
   1: "bg-green text-white",
@@ -11,17 +13,13 @@ const difficultyColors: Record<number, string> = {
   5: "bg-red-600 text-white",
 };
 
-export async function generateStaticParams() {
-  return routes.map((route) => ({ slug: route.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const route = getRouteBySlug(slug);
+  const route = await getRouteBySlug(slug);
   if (!route) return {};
 
   return {
@@ -36,11 +34,12 @@ export default async function RoutePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const route = getRouteBySlug(slug);
+  const route = await getRouteBySlug(slug);
 
   if (!route) notFound();
 
-  const otherRoutes = routes.filter((r) => r.id !== route.id).slice(0, 3);
+  const allRoutes = await getRoutes();
+  const otherRoutes = allRoutes.filter((r) => r.id !== route.id).slice(0, 3);
 
   return (
     <main className="pt-20">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Route } from "@/data/routes";
+import type { RouteData as Route } from "@/lib/data";
 
 const difficultyColors: Record<number, string> = {
   1: "bg-green text-white",
