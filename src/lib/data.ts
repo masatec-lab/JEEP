@@ -100,3 +100,16 @@ export async function getSettings() {
   settings.forEach((s) => (map[s.key] = s.value));
   return map;
 }
+
+export async function getBlogPosts() {
+  return prisma.blogPost.findMany({
+    where: { published: true },
+    orderBy: { publishedAt: "desc" },
+  });
+}
+
+export async function getBlogPostBySlug(slug: string) {
+  return prisma.blogPost.findUnique({
+    where: { slug },
+  });
+}
