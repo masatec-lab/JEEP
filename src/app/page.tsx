@@ -5,6 +5,8 @@ import HowItWorks from "@/components/HowItWorks";
 import Fleet from "@/components/Fleet";
 import Gallery from "@/components/Gallery";
 import Reviews from "@/components/Reviews";
+import FAQ from "@/components/FAQ";
+import CTABlock from "@/components/CTABlock";
 
 export default function Home() {
   return (
@@ -16,6 +18,8 @@ export default function Home() {
       <Fleet />
       <Gallery />
       <Reviews />
+      <FAQ />
+      <CTABlock />
     </main>
   );
 }
