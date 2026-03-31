@@ -1,4 +1,5 @@
 import SectionHeading from "./SectionHeading";
+import StaggerChildren, { StaggerItem } from "./animations/StaggerChildren";
 
 const steps = [
   {
@@ -45,9 +46,9 @@ export default function HowItWorks() {
           subtitle="Три простых шага до незабываемого приключения"
         />
 
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <StaggerChildren stagger={0.2} className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
           {steps.map((step, index) => (
-            <div key={index} className="relative flex flex-col items-center text-center">
+            <StaggerItem key={index} className="relative flex flex-col items-center text-center">
               {/* Connector line (desktop) */}
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-10 left-[calc(50%+40px)] w-[calc(100%-80px)] h-px bg-gradient-to-r from-accent/40 to-accent/10" />
@@ -67,9 +68,9 @@ export default function HowItWorks() {
               <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-sm">
                 {step.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </section>
   );

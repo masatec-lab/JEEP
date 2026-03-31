@@ -1,4 +1,5 @@
 import SectionHeading from "./SectionHeading";
+import StaggerChildren, { StaggerItem } from "./animations/StaggerChildren";
 
 const vehicles = [
   {
@@ -42,9 +43,9 @@ export default function Fleet() {
           subtitle="Проверенные внедорожники, которые пройдут везде"
         />
 
-        <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <StaggerChildren stagger={0.2} className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-2">
           {vehicles.map((vehicle, index) => (
-            <div
+            <StaggerItem
               key={index}
               className="group rounded-2xl border border-border bg-bg-primary overflow-hidden transition-all hover:border-accent/30"
             >
@@ -89,9 +90,9 @@ export default function Fleet() {
                   ))}
                 </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerChildren>
 
         {/* Note */}
         <p className="mt-10 text-center text-sm text-text-muted">

@@ -1,4 +1,5 @@
 import SectionHeading from "./SectionHeading";
+import StaggerChildren, { StaggerItem } from "./animations/StaggerChildren";
 
 const advantages = [
   {
@@ -53,9 +54,9 @@ export default function Advantages() {
           subtitle="Мы знаем горы Адыгеи как свои пять пальцев и сделаем вашу поездку незабываемой"
         />
 
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerChildren stagger={0.15} className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {advantages.map((item, index) => (
-            <div
+            <StaggerItem
               key={index}
               className="group rounded-2xl border border-border bg-bg-secondary p-8 transition-all hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-1"
             >
@@ -68,9 +69,9 @@ export default function Advantages() {
               <p className="mt-3 text-sm text-text-secondary leading-relaxed">
                 {item.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </section>
   );
