@@ -3,6 +3,7 @@ import Advantages from "@/components/Advantages";
 import PopularRoutes from "@/components/PopularRoutes";
 import HowItWorks from "@/components/HowItWorks";
 import Fleet from "@/components/Fleet";
+import Gallery from "@/components/Gallery";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <PopularRoutes />
       <HowItWorks />
       <Fleet />
+      <Gallery />
     </main>
   );
 }
