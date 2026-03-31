@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MessengerWidgetWrapper from "@/components/MessengerWidgetWrapper";
+import { getContacts } from "@/lib/data";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -38,17 +40,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contacts = await getContacts();
+
   return (
     <html lang="ru" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Header />
         {children}
         <Footer />
+        <MessengerWidgetWrapper contacts={contacts} />
       </body>
     </html>
   );
