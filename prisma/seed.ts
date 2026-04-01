@@ -228,6 +228,7 @@ async function main() {
     { name: "Игорь и Марина", date: "Октябрь 2025", rating: 5, text: "Гуамское ущелье — просто вау! Стены скал уходят вверх на сотни метров, чувствуешь себя песчинкой. Долгий маршрут, но ни минуты скуки. Обед в горах — отдельное удовольствие.", route: "Гуамское ущелье", order: 6 },
   ];
 
+  await prisma.review.deleteMany();
   for (const review of reviews) {
     await prisma.review.create({ data: review });
   }
@@ -244,6 +245,8 @@ async function main() {
     { question: "Нужна ли специальная подготовка?", answer: "Никакой подготовки не нужно! Вы — пассажир, за рулём опытный водитель-инструктор. Просто наслаждайтесь поездкой и видами.", order: 8 },
   ];
 
+  // Clear existing FAQ and re-create (no unique field for upsert)
+  await prisma.fAQ.deleteMany();
   for (const faq of faqs) {
     await prisma.fAQ.create({ data: faq });
   }
@@ -260,8 +263,12 @@ async function main() {
     { image: "/images/gallery/8.jpg", alt: "Команда на маршруте", span: "col-span-2", order: 8 },
   ];
 
-  for (const item of galleryItems) {
-    await prisma.galleryItem.create({ data: item });
+  // Only seed gallery if empty (don't wipe uploaded photos)
+  const existingGallery = await prisma.galleryItem.count({ where: { albumId: null } });
+  if (existingGallery === 0) {
+    for (const item of galleryItems) {
+      await prisma.galleryItem.create({ data: item });
+    }
   }
 
   // Albums
