@@ -4,7 +4,7 @@ import Advantages from "@/components/Advantages";
 import PopularRoutes from "@/components/PopularRoutes";
 import HowItWorks from "@/components/HowItWorks";
 import Fleet from "@/components/Fleet";
-import Gallery from "@/components/Gallery";
+import AlbumGallery from "@/components/AlbumGallery";
 import Reviews from "@/components/Reviews";
 import FAQ from "@/components/FAQ";
 import CTABlock from "@/components/CTABlock";
@@ -12,19 +12,19 @@ import {
   getPopularRoutes,
   getReviews,
   getFAQ,
-  getGalleryItems,
+  getAlbums,
   getContacts,
 } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [popularRoutes, reviews, faqItems, galleryItems, contacts] =
+  const [popularRoutes, reviews, faqItems, albums, contacts] =
     await Promise.all([
       getPopularRoutes(),
       getReviews(),
       getFAQ(),
-      getGalleryItems(),
+      getAlbums(),
       getContacts(),
     ]);
 
@@ -65,7 +65,7 @@ export default async function Home() {
       <PopularRoutes routes={popularRoutes} />
       <HowItWorks />
       <Fleet />
-      <Gallery items={galleryItems} />
+      <AlbumGallery albums={albums} />
       <Reviews reviews={reviews} />
       <FAQ items={faqItems} />
       <CTABlock contacts={contacts} />
