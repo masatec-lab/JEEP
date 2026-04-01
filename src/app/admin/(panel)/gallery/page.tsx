@@ -8,6 +8,7 @@ interface GalleryItem {
   image: string;
   alt: string;
   span: string;
+  category: string;
   order: number;
   active: boolean;
 }
@@ -26,16 +27,24 @@ const spanOptions = [
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
+const CATEGORIES = [
+  { value: "gallery", label: "Главная галерея" },
+  { value: "routes", label: "Маршруты" },
+  { value: "fleet", label: "Автопарк" },
+  { value: "team", label: "Команда" },
+];
+
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<GalleryItem | null>(null);
-  const [editForm, setEditForm] = useState({ alt: "", span: "", order: 0, active: true });
+  const [editForm, setEditForm] = useState({ alt: "", span: "", category: "gallery", order: 0, active: true });
   const [dragOver, setDragOver] = useState(false);
   const [uploadQueue, setUploadQueue] = useState<UploadTask[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [selectMode, setSelectMode] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = async () => {
@@ -95,6 +104,7 @@ export default function AdminGalleryPage() {
               image: url,
               alt: pending.file.name.replace(/\.[^.]+$/, ""),
               span: "",
+              category: activeCategory === "all" ? "gallery" : activeCategory,
               order: items.length + 1,
               active: true,
             }),
@@ -218,7 +228,7 @@ export default function AdminGalleryPage() {
 
   const openEdit = (item: GalleryItem) => {
     setEditing(item);
-    setEditForm({ alt: item.alt, span: item.span, order: item.order, active: item.active });
+    setEditForm({ alt: item.alt, span: item.span, category: item.category, order: item.order, active: item.active });
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -262,6 +272,10 @@ export default function AdminGalleryPage() {
   const doneCount = uploadQueue.filter((t) => t.status === "done").length;
   const totalQueue = uploadQueue.length;
   const hasQueue = totalQueue > 0;
+
+  const filteredItems = activeCategory === "all"
+    ? items
+    : items.filter((i) => i.category === activeCategory);
 
   if (loading) {
     return <div className="flex items-center justify-center py-20 text-text-muted">Загрузка...</div>;
@@ -322,10 +336,40 @@ export default function AdminGalleryPage() {
             onClick={selectAll}
             className="text-xs font-medium text-accent hover:text-accent-hover transition-colors"
           >
-            {selected.size === items.length ? "Снять выделение" : "Выбрать все"}
+            {selected.size === filteredItems.length ? "Снять выделение" : "Выбрать все"}
           </button>
         </div>
       )}
+
+      {/* Category tabs */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        <button
+          onClick={() => setActiveCategory("all")}
+          className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
+            activeCategory === "all"
+              ? "bg-accent text-bg-primary"
+              : "bg-bg-secondary text-text-secondary hover:text-text-primary border border-border"
+          }`}
+        >
+          Все ({items.length})
+        </button>
+        {CATEGORIES.map((cat) => {
+          const count = items.filter((i) => i.category === cat.value).length;
+          return (
+            <button
+              key={cat.value}
+              onClick={() => setActiveCategory(cat.value)}
+              className={`rounded-full px-4 py-2 text-xs font-medium transition-colors ${
+                activeCategory === cat.value
+                  ? "bg-accent text-bg-primary"
+                  : "bg-bg-secondary text-text-secondary hover:text-text-primary border border-border"
+              }`}
+            >
+              {cat.label} ({count})
+            </button>
+          );
+        })}
+      </div>
 
       {/* Drag and drop zone */}
       <div
@@ -426,7 +470,7 @@ export default function AdminGalleryPage() {
 
       {/* Gallery grid */}
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {items.map((item) => (
+        {filteredItems.map((item) => (
           <div
             key={item.id}
             onClick={selectMode ? () => toggleSelect(item.id) : undefined}
@@ -571,6 +615,23 @@ export default function AdminGalleryPage() {
                   {spanOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-secondary">
+                  Категория
+                </label>
+                <select
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                  className="mt-1.5 w-full rounded-lg border border-border bg-bg-secondary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none cursor-pointer"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
                     </option>
                   ))}
                 </select>

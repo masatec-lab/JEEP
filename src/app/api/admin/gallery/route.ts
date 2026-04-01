@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       image: data.image,
       alt: data.alt || "",
       span: data.span || "",
+      category: data.category || "gallery",
       order: parseInt(data.order) || 0,
       active: data.active !== false,
     },

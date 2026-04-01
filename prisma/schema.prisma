@@ -69,6 +69,7 @@ model GalleryItem {
   image     String
   alt       String
   span      String   @default("")
+  category  String   @default("gallery")
   order     Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
