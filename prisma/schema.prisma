@@ -64,6 +64,19 @@ model FAQ {
   updatedAt DateTime @updatedAt
 }
 
+model Album {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  description String        @default("")
+  coverImage  String        @default("")
+  order       Int           @default(0)
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  photos      GalleryItem[]
+}
+
 model GalleryItem {
   id        String   @id @default(cuid())
   image     String
@@ -72,6 +85,8 @@ model GalleryItem {
   category  String   @default("gallery")
   order     Int      @default(0)
   active    Boolean  @default(true)
+  albumId   String?
+  album     Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

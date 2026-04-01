@@ -113,3 +113,28 @@ export async function getBlogPostBySlug(slug: string) {
     where: { slug },
   });
 }
+
+export async function getAlbums() {
+  return prisma.album.findMany({
+    where: { active: true },
+    orderBy: { order: "asc" },
+    include: {
+      photos: {
+        where: { active: true },
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+}
+
+export async function getAlbumBySlug(slug: string) {
+  return prisma.album.findUnique({
+    where: { slug },
+    include: {
+      photos: {
+        where: { active: true },
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+}

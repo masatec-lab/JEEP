@@ -264,6 +264,66 @@ async function main() {
     await prisma.galleryItem.create({ data: item });
   }
 
+  // Albums
+  const albums = [
+    {
+      slug: "panoramy-lago-naki",
+      title: "Панорамы Лаго-Наки",
+      description: "Захватывающие виды с легендарного плато — альпийские луга, снежные вершины и бескрайнее небо",
+      order: 1,
+    },
+    {
+      slug: "vodopady-adygei",
+      title: "Водопады Адыгеи",
+      description: "Мощные каскады, природные чаши и ледяные горные потоки",
+      order: 2,
+    },
+    {
+      slug: "zimniy-dzhipping",
+      title: "Зимний джиппинг",
+      description: "Снежные горные дороги, заиндевевшие деревья и особенная атмосфера зимнего Кавказа",
+      order: 3,
+    },
+    {
+      slug: "guamskoe-ushchelye",
+      title: "Гуамское ущелье",
+      description: "400-метровые стены скал, реликтовые леса и узкоколейная железная дорога",
+      order: 4,
+    },
+    {
+      slug: "gornyye-dorogi",
+      title: "Горные дороги",
+      description: "Бездорожье, броды, серпантины — то, ради чего выбирают джиппинг",
+      order: 5,
+    },
+    {
+      slug: "nash-avtopark",
+      title: "Наш автопарк",
+      description: "УАЗ Хантер и Патриот — надёжные машины для любых маршрутов",
+      order: 6,
+    },
+    {
+      slug: "zakaty-v-gorah",
+      title: "Закаты в горах",
+      description: "Золотой час в горах Адыгеи — моменты, которые хочется остановить",
+      order: 7,
+    },
+    {
+      slug: "nasha-komanda",
+      title: "Наша команда",
+      description: "Люди, которые знают каждую тропу и влюблены в эти горы",
+      order: 8,
+    },
+  ];
+
+  for (const album of albums) {
+    await prisma.album.upsert({
+      where: { slug: album.slug },
+      update: album,
+      create: album,
+    });
+  }
+
   // Contacts
   const contacts = [
     { key: "phone", value: "+7 (999) 123-45-67" },
