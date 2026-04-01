@@ -34,6 +34,8 @@ export default function AdminGalleryPage() {
   const [dragOver, setDragOver] = useState(false);
   const [uploadQueue, setUploadQueue] = useState<UploadTask[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selectMode, setSelectMode] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = async () => {
@@ -151,6 +153,54 @@ export default function AdminGalleryPage() {
     if (fileRef.current) fileRef.current.value = "";
   };
 
+  // Selection handlers
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selected.size === items.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(items.map((i) => i.id)));
+    }
+  };
+
+  const exitSelectMode = () => {
+    setSelectMode(false);
+    setSelected(new Set());
+  };
+
+  const bulkDelete = async () => {
+    if (!confirm(`Удалить ${selected.size} фото?`)) return;
+    for (const id of selected) {
+      await fetch(`/api/admin/gallery/${id}`, { method: "DELETE" });
+    }
+    setSelected(new Set());
+    setSelectMode(false);
+    fetchItems();
+  };
+
+  const bulkToggleActive = async (active: boolean) => {
+    for (const id of selected) {
+      const item = items.find((i) => i.id === id);
+      if (!item) continue;
+      await fetch(`/api/admin/gallery/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...item, active }),
+      });
+    }
+    setSelected(new Set());
+    setSelectMode(false);
+    fetchItems();
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Удалить фото из галереи?")) return;
     const res = await fetch(`/api/admin/gallery/${id}`, { method: "DELETE" });
@@ -224,7 +274,58 @@ export default function AdminGalleryPage() {
           <h1 className="text-2xl font-bold text-text-primary">Галерея</h1>
           <p className="mt-1 text-sm text-text-muted">{items.length} фото</p>
         </div>
+        <button
+          onClick={() => selectMode ? exitSelectMode() : setSelectMode(true)}
+          className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+            selectMode
+              ? "border-accent text-accent"
+              : "border-border text-text-secondary hover:border-accent hover:text-accent"
+          }`}
+        >
+          {selectMode ? "Отмена" : "Выбрать"}
+        </button>
       </div>
+
+      {/* Bulk actions bar */}
+      {selectMode && selected.size > 0 && (
+        <div className="mt-4 flex items-center gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3">
+          <span className="text-sm font-medium text-text-primary">
+            Выбрано: {selected.size}
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => bulkToggleActive(true)}
+              className="rounded-lg bg-green/10 px-3 py-1.5 text-xs font-medium text-green hover:bg-green/20 transition-colors"
+            >
+              Показать
+            </button>
+            <button
+              onClick={() => bulkToggleActive(false)}
+              className="rounded-lg bg-bg-tertiary px-3 py-1.5 text-xs font-medium text-text-muted hover:text-text-primary transition-colors"
+            >
+              Скрыть
+            </button>
+            <button
+              onClick={bulkDelete}
+              className="rounded-lg bg-terracotta/10 px-3 py-1.5 text-xs font-medium text-terracotta hover:bg-terracotta/20 transition-colors"
+            >
+              Удалить
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Select all toggle */}
+      {selectMode && (
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            onClick={selectAll}
+            className="text-xs font-medium text-accent hover:text-accent-hover transition-colors"
+          >
+            {selected.size === items.length ? "Снять выделение" : "Выбрать все"}
+          </button>
+        </div>
+      )}
 
       {/* Drag and drop zone */}
       <div
@@ -328,10 +429,34 @@ export default function AdminGalleryPage() {
         {items.map((item) => (
           <div
             key={item.id}
-            className={`group relative rounded-xl border border-border overflow-hidden transition-opacity ${
+            onClick={selectMode ? () => toggleSelect(item.id) : undefined}
+            className={`group relative rounded-xl border overflow-hidden transition-all ${
               !item.active ? "opacity-40" : ""
-            }`}
+            } ${
+              selected.has(item.id)
+                ? "border-accent ring-2 ring-accent/30"
+                : "border-border"
+            } ${selectMode ? "cursor-pointer" : ""}`}
           >
+            {/* Checkbox */}
+            {selectMode && (
+              <div className="absolute top-2 left-2 z-20">
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-md border-2 transition-colors ${
+                    selected.has(item.id)
+                      ? "bg-accent border-accent text-bg-primary"
+                      : "border-white/70 bg-black/30"
+                  }`}
+                >
+                  {selected.has(item.id) && (
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Image */}
             <div className="relative aspect-square bg-bg-tertiary">
               {item.image.startsWith("/uploads") ? (
@@ -348,7 +473,8 @@ export default function AdminGalleryPage() {
                 </div>
               )}
 
-              {/* Overlay on hover */}
+              {/* Overlay on hover (only in normal mode) */}
+              {!selectMode && (
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                 <div className="flex gap-2">
                   <button
@@ -365,6 +491,7 @@ export default function AdminGalleryPage() {
                   </button>
                 </div>
               </div>
+              )}
             </div>
 
             {/* Info */}
