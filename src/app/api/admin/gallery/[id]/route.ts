@@ -26,6 +26,7 @@ export async function PUT(
       category: data.category || "gallery",
       order: parseInt(data.order) || 0,
       active: data.active !== false,
+      albumId: data.albumId !== undefined ? (data.albumId || null) : undefined,
     },
   });
   return NextResponse.json(item);
