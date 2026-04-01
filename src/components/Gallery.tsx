@@ -58,10 +58,20 @@ export default function Gallery({ items: galleryItems }: { items: GalleryItemDat
               onClick={() => openLightbox(index)}
               className={`group relative overflow-hidden rounded-xl ${item.span} cursor-pointer`}
             >
-              {/* Gradient placeholder */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]}`}
-              />
+              {/* Image or gradient fallback */}
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.alt}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+              ) : (
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]}`}
+                />
+              )}
 
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors z-10 flex items-center justify-center">
@@ -114,14 +124,26 @@ export default function Gallery({ items: galleryItems }: { items: GalleryItemDat
             className="relative w-full max-w-4xl mx-16 aspect-video rounded-xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${gradients[lightboxIndex % gradients.length]}`}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-text-secondary text-lg">
-                {galleryItems[lightboxIndex].alt}
-              </p>
-            </div>
+            {galleryItems[lightboxIndex].image ? (
+              <Image
+                src={galleryItems[lightboxIndex].image}
+                alt={galleryItems[lightboxIndex].alt}
+                fill
+                className="object-contain"
+                sizes="100vw"
+              />
+            ) : (
+              <>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${gradients[lightboxIndex % gradients.length]}`}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-text-secondary text-lg">
+                    {galleryItems[lightboxIndex].alt}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Next button */}
