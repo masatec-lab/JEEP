@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { RouteData as Route } from "@/lib/data";
 
 const difficultyColors: Record<number, string> = {
@@ -15,9 +16,19 @@ export default function RouteCard({ route }: { route: Route }) {
       href={`/routes/${route.slug}`}
       className="group flex flex-col rounded-2xl border border-border bg-bg-secondary overflow-hidden transition-all hover:border-accent/30 hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-1"
     >
-      {/* Image placeholder */}
+      {/* Image */}
       <div className="relative h-56 overflow-hidden bg-bg-tertiary">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a1a] via-[#0d1f2d] to-[#1a1a1a]" />
+        {route.image && route.image.startsWith("/uploads") ? (
+          <Image
+            src={route.image}
+            alt={route.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a1a] via-[#0d1f2d] to-[#1a1a1a]" />
+        )}
 
         {/* Difficulty badge */}
         <div className="absolute top-4 left-4 z-10">

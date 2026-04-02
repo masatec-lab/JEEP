@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getRouteBySlug, getRoutes } from "@/lib/data";
 import JsonLd from "@/components/JsonLd";
+import { ExtraHoursCalc, RoutePhotoGallery } from "@/components/RoutePageClient";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -78,8 +80,19 @@ export default async function RoutePage({
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a1a] via-[#0d1f2d] to-[#0A0A0A]" />
-        <div className="absolute inset-0 bg-black/30" />
+        {route.image && route.image.startsWith("/uploads") ? (
+          <Image
+            src={route.image}
+            alt={route.name}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a1a] via-[#0d1f2d] to-[#0A0A0A]" />
+        )}
+        <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 flex h-full items-end">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-12">
             <span
@@ -153,6 +166,11 @@ export default async function RoutePage({
                   ))}
                 </ul>
               </div>
+
+              {/* Route photos */}
+              {route.photos && route.photos.length > 0 && (
+                <RoutePhotoGallery photos={route.photos} />
+              )}
             </div>
 
             {/* Sidebar */}
@@ -212,6 +230,16 @@ export default async function RoutePage({
                     </div>
                   </div>
                 </div>
+
+                {/* Extra hours calculator */}
+                {route.extraHourPrice > 0 && route.maxExtraHours > 0 && (
+                  <ExtraHoursCalc
+                    basePrice={route.price}
+                    extraHourPrice={route.extraHourPrice}
+                    maxExtraHours={route.maxExtraHours}
+                    duration={route.duration}
+                  />
+                )}
 
                 {/* CTA */}
                 <div className="space-y-3 border-t border-border pt-6">
