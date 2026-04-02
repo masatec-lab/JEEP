@@ -21,7 +21,14 @@ export default function EditRoutePage() {
         const parseField = (val: unknown): string[] => {
           if (Array.isArray(val)) return val;
           if (typeof val === "string") {
-            try { return JSON.parse(val); } catch { return []; }
+            try {
+              let parsed = JSON.parse(val);
+              // Handle double-encoded JSON
+              while (typeof parsed === "string") {
+                parsed = JSON.parse(parsed);
+              }
+              if (Array.isArray(parsed)) return parsed;
+            } catch { return []; }
           }
           return [];
         };
