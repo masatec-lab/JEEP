@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface RouteData {
   id?: string;
@@ -19,6 +20,8 @@ interface RouteData {
   included: string[];
   image: string;
   startPoint: string;
+  extraHourPrice: number;
+  maxExtraHours: number;
   popular: boolean;
   active: boolean;
   order: number;
@@ -68,6 +71,8 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
       included: ["Проезд на УАЗе", "Опытный водитель-инструктор"],
       image: "",
       startPoint: "пос. Каменномостский",
+      extraHourPrice: 1500,
+      maxExtraHours: 2,
       popular: false,
       active: true,
       order: 0,
@@ -76,6 +81,9 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const photoRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -121,6 +129,35 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
 
   const removeListItem = (field: "highlights" | "included", index: number) => {
     setForm({ ...form, [field]: form[field].filter((_, i) => i !== index) });
+  };
+
+  const uploadPhoto = async (file: File) => {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "routes");
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const { url } = await res.json();
+        setForm((prev) => ({ ...prev, image: url }));
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePhotoDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) uploadPhoto(file);
+  };
+
+  const handlePhotoInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadPhoto(file);
+    if (photoRef.current) photoRef.current.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -442,22 +479,134 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
         ))}
       </div>
 
-      {/* Image */}
+      {/* Main photo */}
+      <div className="rounded-xl border border-border bg-bg-secondary p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-text-primary">Главное фото</h2>
+
+        {form.image ? (
+          <div className="relative group">
+            <div className="relative h-48 rounded-xl overflow-hidden bg-bg-tertiary">
+              {form.image.startsWith("/uploads") ? (
+                <Image
+                  src={form.image}
+                  alt={form.name || "Фото маршрута"}
+                  fill
+                  className="object-cover"
+                  sizes="600px"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1a2a1a] via-[#0d1f2d] to-[#1a1a1a] flex items-center justify-center">
+                  <span className="text-xs text-text-muted">{form.image}</span>
+                </div>
+              )}
+
+              {/* Replace overlay */}
+              <label className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/50 transition-colors cursor-pointer">
+                <span className="opacity-0 group-hover:opacity-100 rounded-lg bg-white/90 px-4 py-2 text-xs font-medium text-bg-primary transition-opacity">
+                  {uploading ? "Загрузка..." : "Заменить фото"}
+                </span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
+                  onChange={handlePhotoInput}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, image: "" })}
+              className="mt-2 text-xs text-text-muted hover:text-terracotta transition-colors"
+            >
+              Удалить фото
+            </button>
+          </div>
+        ) : (
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+            onDrop={handlePhotoDrop}
+            onClick={() => photoRef.current?.click()}
+            className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-10 cursor-pointer transition-all ${
+              dragOver ? "border-accent bg-accent/5" : "border-border hover:border-accent/50"
+            }`}
+          >
+            <input
+              ref={photoRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              onChange={handlePhotoInput}
+              className="hidden"
+            />
+            <svg viewBox="0 0 24 24" className="h-8 w-8 text-text-muted" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+            <p className="mt-3 text-sm text-text-primary">
+              {uploading ? "Загрузка..." : dragOver ? "Отпустите файл" : "Перетащите фото или нажмите"}
+            </p>
+            <p className="mt-1 text-xs text-text-muted">JPG, PNG, WebP, AVIF — до 10 МБ</p>
+          </div>
+        )}
+      </div>
+
+      {/* Extra hours */}
       <div className="rounded-xl border border-border bg-bg-secondary p-6 space-y-5">
-        <h2 className="text-lg font-semibold text-text-primary">Фото</h2>
-        <div>
-          <label className="block text-sm font-medium text-text-secondary">
-            Путь к изображению
-          </label>
-          <input
-            type="text"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
-            placeholder="/images/routes/photo.jpg"
-          />
+        <h2 className="text-lg font-semibold text-text-primary">Продление маршрута</h2>
+        <p className="text-xs text-text-muted">
+          Клиенты смогут продлить поездку за дополнительную плату. Укажите 0 чтобы отключить.
+        </p>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-text-secondary">
+              Цена за доп. час (₽)
+            </label>
+            <input
+              type="number"
+              name="extraHourPrice"
+              value={form.extraHourPrice}
+              onChange={handleChange}
+              className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
+              min="0"
+              step="500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-text-secondary">
+              Макс. доп. часов
+            </label>
+            <input
+              type="number"
+              name="maxExtraHours"
+              value={form.maxExtraHours}
+              onChange={handleChange}
+              className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
+              min="0"
+              max="5"
+            />
+          </div>
         </div>
+
+        {form.extraHourPrice > 0 && form.maxExtraHours > 0 && (
+          <div className="rounded-lg bg-bg-primary p-4 border border-border">
+            <p className="text-xs font-medium text-text-muted mb-2">Как увидит клиент:</p>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-sm">
+                <span className="text-text-secondary">Базовый маршрут ({form.duration})</span>
+                <span className="font-medium text-text-primary">{form.price.toLocaleString("ru-RU")} ₽</span>
+              </div>
+              {Array.from({ length: form.maxExtraHours }).map((_, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span className="text-text-secondary">+ {i + 1} час</span>
+                  <span className="font-medium text-accent">
+                    {(form.price + form.extraHourPrice * (i + 1)).toLocaleString("ru-RU")} ₽
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Actions */}

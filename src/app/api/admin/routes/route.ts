@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
       image: data.image || "",
       gallery: JSON.stringify(data.gallery || []),
       startPoint: data.startPoint,
+      extraHourPrice: parseInt(data.extraHourPrice) || 0,
+      maxExtraHours: parseInt(data.maxExtraHours) || 0,
       popular: data.popular || false,
       order: parseInt(data.order) || 0,
       active: data.active !== false,
