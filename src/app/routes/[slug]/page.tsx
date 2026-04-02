@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getRouteBySlug, getRoutes } from "@/lib/data";
+import { getRouteBySlug, getRoutes, getContacts } from "@/lib/data";
 import JsonLd from "@/components/JsonLd";
 import { ExtraHoursCalc, RoutePhotoGallery } from "@/components/RoutePageClient";
 import type { Metadata } from "next";
@@ -41,7 +41,7 @@ export default async function RoutePage({
 
   if (!route) notFound();
 
-  const allRoutes = await getRoutes();
+  const [allRoutes, contacts] = await Promise.all([getRoutes(), getContacts()]);
   const otherRoutes = allRoutes.filter((r) => r.id !== route.id).slice(0, 3);
 
   const routeLd = {
@@ -250,7 +250,7 @@ export default async function RoutePage({
                     Забронировать
                   </Link>
                   <a
-                    href="https://wa.me/79991234567"
+                    href={contacts.whatsapp || "https://wa.me/79991234567"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-center justify-center gap-2 rounded-full border border-green py-3.5 text-sm font-semibold text-green hover:bg-green hover:text-white transition-colors"
@@ -261,10 +261,10 @@ export default async function RoutePage({
                     Написать в WhatsApp
                   </a>
                   <a
-                    href="tel:+79991234567"
+                    href={`tel:${contacts.phone_raw || "+79991234567"}`}
                     className="block w-full text-center text-sm font-medium text-text-muted hover:text-accent transition-colors py-2"
                   >
-                    или позвоните: +7 (999) 123-45-67
+                    или позвоните: {contacts.phone || "+7 (999) 123-45-67"}
                   </a>
                 </div>
               </div>

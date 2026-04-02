@@ -11,7 +11,7 @@ const navLinks = [
   { href: "/contacts", label: "Контакты" },
 ];
 
-export default function Header() {
+export default function Header({ contacts }: { contacts: Record<string, string> }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -58,10 +58,10 @@ export default function Header() {
               </Link>
             ))}
             <a
-              href="tel:+79991234567"
+              href={`tel:${contacts.phone_raw || "+79991234567"}`}
               className="text-sm font-semibold text-accent hover:text-accent-hover transition-colors"
             >
-              +7 (999) 123-45-67
+              {contacts.phone || "+7 (999) 123-45-67"}
             </a>
             <ThemeToggle />
             <Link
@@ -116,10 +116,10 @@ export default function Header() {
               </Link>
             ))}
             <a
-              href="tel:+79991234567"
+              href={`tel:${contacts.phone_raw || "+79991234567"}`}
               className="text-base font-semibold text-accent py-2"
             >
-              +7 (999) 123-45-67
+              {contacts.phone || "+7 (999) 123-45-67"}
             </a>
             <div className="flex items-center gap-3 py-2">
               <ThemeToggle />

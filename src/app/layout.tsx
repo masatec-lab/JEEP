@@ -59,9 +59,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <Header />
+          <Header contacts={contacts} />
           {children}
-          <Footer />
+          <Footer contacts={contacts} />
           <MessengerWidgetWrapper contacts={contacts} />
         </ThemeProvider>
       </body>

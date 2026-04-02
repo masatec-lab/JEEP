@@ -12,7 +12,7 @@ const routeLinks = [
   { href: "/routes/sahrayskie-vodopady", label: "Сахрайские водопады" },
 ];
 
-export default function Footer() {
+export default function Footer({ contacts }: { contacts: Record<string, string> }) {
   return (
     <footer className="border-t border-border bg-bg-secondary">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -85,10 +85,10 @@ export default function Footer() {
             <ul className="mt-4 space-y-3">
               <li>
                 <a
-                  href="tel:+79991234567"
+                  href={`tel:${contacts.phone_raw || "+79991234567"}`}
                   className="text-sm font-semibold text-accent hover:text-accent-hover transition-colors"
                 >
-                  +7 (999) 123-45-67
+                  {contacts.phone || "+7 (999) 123-45-67"}
                 </a>
               </li>
               <li className="text-sm text-text-secondary">
@@ -99,7 +99,7 @@ export default function Footer() {
             {/* Messengers */}
             <div className="mt-6 flex gap-3">
               <a
-                href="https://wa.me/79991234567"
+                href={contacts.whatsapp || "https://wa.me/79991234567"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary hover:bg-green hover:text-white transition-colors"
@@ -110,7 +110,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://t.me/jeepping_travel"
+                href={contacts.telegram || "https://t.me/jeepping_travel"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary hover:bg-[#2AABEE] hover:text-white transition-colors"
@@ -121,7 +121,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://max.ru/jeepping_travel"
+                href={contacts.max || "https://max.ru/jeepping_travel"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-tertiary text-text-secondary hover:bg-[#FF6600] hover:text-white transition-colors"
