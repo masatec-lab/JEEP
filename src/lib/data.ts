@@ -17,6 +17,8 @@ export interface RouteData {
   image: string;
   gallery: string[];
   startPoint: string;
+  extraHourPrice: number;
+  maxExtraHours: number;
   popular: boolean;
 }
 

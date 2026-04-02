@@ -33,6 +33,8 @@ model Route {
   image            String
   gallery          String
   startPoint       String
+  extraHourPrice   Int      @default(0)
+  maxExtraHours    Int      @default(0)
   popular          Boolean  @default(false)
   order            Int      @default(0)
   active           Boolean  @default(true)
