@@ -199,7 +199,7 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl space-y-8">
+    <form id="route-form" onSubmit={handleSubmit} className="max-w-3xl space-y-8">
       {error && (
         <div className="rounded-lg bg-terracotta/10 border border-terracotta/20 px-4 py-3 text-sm text-terracotta">
           {error}
@@ -609,23 +609,6 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-4">
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-accent px-6 py-2.5 text-sm font-semibold text-bg-primary hover:bg-accent-hover transition-colors disabled:opacity-50"
-        >
-          {saving ? "Сохранение..." : isEdit ? "Сохранить" : "Создать маршрут"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/admin/routes")}
-          className="rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-        >
-          Отмена
-        </button>
-      </div>
     </form>
   );
 }
