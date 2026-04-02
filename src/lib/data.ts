@@ -20,6 +20,7 @@ export interface RouteData {
   extraHourPrice: number;
   maxExtraHours: number;
   popular: boolean;
+  photos?: { id: string; image: string; alt: string }[];
 }
 
 function parseRoute(raw: {
@@ -55,9 +56,20 @@ export async function getPopularRoutes() {
 }
 
 export async function getRouteBySlug(slug: string) {
-  const raw = await prisma.route.findUnique({ where: { slug } });
+  const raw = await prisma.route.findUnique({
+    where: { slug },
+    include: {
+      photos: {
+        where: { active: true },
+        orderBy: { order: "asc" },
+        select: { id: true, image: true, alt: true },
+      },
+    },
+  });
   if (!raw || !raw.active) return null;
-  return parseRoute(raw);
+  const parsed = parseRoute(raw);
+  parsed.photos = raw.photos;
+  return parsed;
 }
 
 export async function getAllRouteSlugs() {

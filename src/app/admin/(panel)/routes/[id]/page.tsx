@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import RouteForm from "@/components/admin/RouteForm";
+import RouteGallery from "@/components/admin/RouteGallery";
 
 export default function EditRoutePage() {
   const params = useParams();
@@ -51,8 +52,9 @@ export default function EditRoutePage() {
         Редактирование маршрута
       </h1>
       <p className="mt-1 text-sm text-text-muted">{route?.name}</p>
-      <div className="mt-6">
+      <div className="mt-6 space-y-8">
         {route && <RouteForm initial={route} />}
+        {route?.id && <RouteGallery routeId={route.id} />}
       </div>
     </div>
   );

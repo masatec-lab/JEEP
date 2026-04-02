@@ -40,6 +40,7 @@ model Route {
   active           Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  photos           GalleryItem[] @relation("RoutePhotos")
 }
 
 model Review {
@@ -89,6 +90,8 @@ model GalleryItem {
   active    Boolean  @default(true)
   albumId   String?
   album     Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  routeId   String?
+  route     Route?   @relation("RoutePhotos", fields: [routeId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
