@@ -18,10 +18,17 @@ export default function EditRoutePage() {
       const res = await fetch(`/api/admin/routes/${params.id}`);
       if (res.ok) {
         const data = await res.json();
+        const parseField = (val: unknown): string[] => {
+          if (Array.isArray(val)) return val;
+          if (typeof val === "string") {
+            try { return JSON.parse(val); } catch { return []; }
+          }
+          return [];
+        };
         setRoute({
           ...data,
-          highlights: JSON.parse(data.highlights || "[]"),
-          included: JSON.parse(data.included || "[]"),
+          highlights: parseField(data.highlights),
+          included: parseField(data.included),
         });
       } else {
         setError("Маршрут не найден");
