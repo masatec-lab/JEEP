@@ -175,9 +175,9 @@ export default async function RoutePage({
 
             {/* Sidebar */}
             <div>
-              <div className="sticky top-28 rounded-2xl border border-border bg-bg-secondary p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
-                {/* Price */}
-                <div>
+              <div className="sticky top-28 rounded-2xl border border-border bg-bg-secondary flex flex-col max-h-[calc(100vh-8rem)]">
+                {/* Price — always visible top */}
+                <div className="p-6 pb-0">
                   <div className="text-sm text-text-muted">Стоимость</div>
                   <div className="mt-1 text-3xl font-bold text-accent">
                     от {route.price.toLocaleString("ru-RU")} ₽
@@ -185,66 +185,63 @@ export default async function RoutePage({
                   <div className="text-sm text-text-muted">{route.priceNote}</div>
                 </div>
 
-                {/* Meta */}
-                <div className="space-y-4 border-t border-border pt-6">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-muted">Длительность</span>
-                    <span className="text-sm font-medium text-text-primary">
-                      {route.duration}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-muted">Сложность</span>
-                    <span
-                      className={`inline-block rounded-full px-3 py-0.5 text-xs font-semibold ${
-                        difficultyColors[route.difficulty]
-                      }`}
-                    >
-                      {route.difficultyLabel}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-muted">Пассажиры</span>
-                    <span className="text-sm font-medium text-text-primary">
-                      до {route.maxPassengers} чел.
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-muted">Старт</span>
-                    <span className="text-sm font-medium text-text-primary">
-                      {route.startPoint}
-                    </span>
-                  </div>
-                  {/* Difficulty bar */}
-                  <div>
-                    <span className="text-sm text-text-muted">Уровень сложности</span>
-                    <div className="mt-2 flex gap-1.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-2 flex-1 rounded-full ${
-                            i < route.difficulty ? "bg-accent" : "bg-bg-tertiary"
-                          }`}
-                        />
-                      ))}
+                {/* Scrollable middle */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* Meta */}
+                  <div className="space-y-4 border-t border-border pt-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-text-muted">Длительность</span>
+                      <span className="text-sm font-medium text-text-primary">
+                        {route.duration}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-text-muted">Сложность</span>
+                      <span
+                        className={`inline-block rounded-full px-3 py-0.5 text-xs font-semibold ${
+                          difficultyColors[route.difficulty]
+                        }`}
+                      >
+                        {route.difficultyLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-text-muted">Пассажиры</span>
+                      <span className="text-sm font-medium text-text-primary">
+                        до {route.maxPassengers} чел.
+                      </span>
+                    </div>
+                    {/* Difficulty bar */}
+                    <div>
+                      <span className="text-sm text-text-muted">Уровень сложности</span>
+                      <div className="mt-2 flex gap-1.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-2 flex-1 rounded-full ${
+                              i < route.difficulty ? "bg-accent" : "bg-bg-tertiary"
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Price calculator */}
+                  <PriceCalc
+                    basePrice={route.price}
+                    extraHourPrice={route.extraHourPrice}
+                    maxExtraHours={route.maxExtraHours}
+                    duration={route.duration}
+                    startPoints={route.startPoints}
+                  />
                 </div>
 
-                {/* Price calculator */}
-                <PriceCalc
-                  basePrice={route.price}
-                  extraHourPrice={route.extraHourPrice}
-                  maxExtraHours={route.maxExtraHours}
-                  duration={route.duration}
-                  startPoints={route.startPoints}
-                />
-
-                {/* CTA */}
-                <div className="space-y-3 border-t border-border pt-6">
+                {/* CTA — always visible bottom */}
+                <div className="p-6 pt-0 space-y-3 border-t border-border">
                   <Link
                     href="/contacts#booking"
-                    className="block w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-bg-primary hover:bg-accent-hover transition-colors"
+                    className="block w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-bg-primary hover:bg-accent-hover transition-colors mt-4"
                   >
                     Забронировать
                   </Link>
