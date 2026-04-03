@@ -72,8 +72,8 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Smooth scroll */
-html {
+/* Smooth scroll — via data attribute for Next.js compatibility */
+html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 

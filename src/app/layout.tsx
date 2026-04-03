@@ -49,7 +49,7 @@ export default async function RootLayout({
   const contacts = await getContacts();
 
   return (
-    <html lang="ru" className={`${montserrat.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="ru" className={`${montserrat.variable} h-full antialiased`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
