@@ -175,7 +175,7 @@ export default async function RoutePage({
 
             {/* Sidebar */}
             <div>
-              <div className="sticky top-28 rounded-2xl border border-border bg-bg-secondary p-6 space-y-6">
+              <div className="sticky top-28 rounded-2xl border border-border bg-bg-secondary p-6 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto">
                 {/* Price */}
                 <div>
                   <div className="text-sm text-text-muted">Стоимость</div>
