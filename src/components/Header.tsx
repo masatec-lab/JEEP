@@ -100,7 +100,7 @@ export default function Header({ contacts }: { contacts: Record<string, string> 
       {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 overflow-hidden ${
-          mobileMenuOpen ? "max-h-96 border-b border-border" : "max-h-0"
+          mobileMenuOpen ? "max-h-[32rem] border-b border-border" : "max-h-0"
         }`}
       >
         <div className="bg-bg-primary/95 backdrop-blur-md px-4 pb-6 pt-2">
