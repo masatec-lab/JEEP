@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 
@@ -157,6 +157,79 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
     zoomRef.current?.resetTransform();
   }, []);
 
+  const goPrev = useCallback(() => {
+    resetZoom();
+    setLightboxIndex((i) => (i === null ? null : i === 0 ? photos.length - 1 : i - 1));
+  }, [photos.length, resetZoom]);
+
+  const goNext = useCallback(() => {
+    resetZoom();
+    setLightboxIndex((i) => (i === null ? null : i === photos.length - 1 ? 0 : i + 1));
+  }, [photos.length, resetZoom]);
+
+  // Auto-play
+  const [paused, setPaused] = useState(false);
+  const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (lightboxIndex === null || paused) {
+      if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current);
+      return;
+    }
+    autoplayTimerRef.current = setInterval(() => {
+      resetZoom();
+      setLightboxIndex((i) => (i === null ? null : i === photos.length - 1 ? 0 : i + 1));
+    }, 4000);
+    return () => {
+      if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current);
+    };
+  }, [lightboxIndex, paused, photos.length, resetZoom]);
+
+  const pauseAutoplay = useCallback(() => {
+    setPaused(true);
+    setTimeout(() => setPaused(false), 8000);
+  }, []);
+
+  const goPrevManual = useCallback(() => { pauseAutoplay(); goPrev(); }, [pauseAutoplay, goPrev]);
+  const goNextManual = useCallback(() => { pauseAutoplay(); goNext(); }, [pauseAutoplay, goNext]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrevManual();
+      if (e.key === "ArrowRight") goNextManual();
+      if (e.key === "Escape") setLightboxIndex(null);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [lightboxIndex, goPrevManual, goNextManual]);
+
+  // Swipe
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const swipeHandled = useRef(false);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      swipeHandled.current = false;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStart.current || swipeHandled.current) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0) goPrevManual();
+      else goNextManual();
+      swipeHandled.current = true;
+    }
+    touchStart.current = null;
+  }, [goPrevManual, goNextManual]);
+
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
   if (photos.length === 0) return null;
 
   return (
@@ -198,9 +271,15 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
             </button>
           </div>
 
-          <div className="flex-1 flex items-center justify-center px-4 relative" onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={imageContainerRef}
+            className="flex-1 flex items-center justify-center px-2 sm:px-4 relative"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <button
-              onClick={() => { resetZoom(); setLightboxIndex(lightboxIndex === 0 ? photos.length - 1 : lightboxIndex - 1); }}
+              onClick={() => goPrevManual()}
               className="absolute left-1 sm:left-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -217,7 +296,11 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
                 doubleClick={{ mode: "toggle", step: 2 }}
                 pinch={{ step: 30 }}
                 wheel={{ step: 0.8, smoothStep: 0.01 }}
-                panning={{ velocityDisabled: false }}
+                panning={{ disabled: true }}
+                onTransformed={(_ref, state) => {
+                  if (state.scale > 1) setPaused(true);
+                  else setPaused(false);
+                }}
               >
                 <TransformComponent
                   wrapperStyle={{ width: "100%", height: "100%" }}
@@ -228,7 +311,7 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
                     alt={photos[lightboxIndex].alt}
                     fill
                     className="object-contain"
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 90vw, 70vw"
                     priority
                     draggable={false}
                   />
@@ -237,7 +320,7 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
             </div>
 
             <button
-              onClick={() => { resetZoom(); setLightboxIndex(lightboxIndex === photos.length - 1 ? 0 : lightboxIndex + 1); }}
+              onClick={() => goNextManual()}
               className="absolute right-1 sm:right-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>

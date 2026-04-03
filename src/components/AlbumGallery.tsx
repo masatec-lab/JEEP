@@ -79,6 +79,61 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [activeAlbum, goPrev, goNext]);
 
+  // Auto-play
+  const [paused, setPaused] = useState(false);
+  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!activeAlbum || paused) {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+      return;
+    }
+    autoplayRef.current = setInterval(() => {
+      resetZoom();
+      setCarouselIndex((i) =>
+        i === activeAlbum.photos.length - 1 ? 0 : i + 1
+      );
+    }, 4000);
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+    };
+  }, [activeAlbum, paused, resetZoom]);
+
+  // Pause on manual interaction, resume after 8s
+  const pauseAutoplay = useCallback(() => {
+    setPaused(true);
+    setTimeout(() => setPaused(false), 8000);
+  }, []);
+
+  const goPrevManual = useCallback(() => { pauseAutoplay(); goPrev(); }, [pauseAutoplay, goPrev]);
+  const goNextManual = useCallback(() => { pauseAutoplay(); goNext(); }, [pauseAutoplay, goNext]);
+  const goToManual = useCallback((i: number) => { pauseAutoplay(); resetZoom(); setCarouselIndex(i); }, [pauseAutoplay, resetZoom]);
+
+  // Swipe & trackpad horizontal scroll
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const swipeHandled = useRef(false);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      swipeHandled.current = false;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStart.current || swipeHandled.current) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0) goPrevManual();
+      else goNextManual();
+      swipeHandled.current = true;
+    }
+    touchStart.current = null;
+  }, [goPrevManual, goNextManual]);
+
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
   return (
     <section className="py-20 sm:py-28 bg-bg-primary">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -174,10 +229,16 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
           </div>
 
           {/* Main image */}
-          <div className="flex-1 flex items-center justify-center px-2 sm:px-4 relative" onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={imageContainerRef}
+            className="flex-1 flex items-center justify-center px-2 sm:px-4 relative"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Prev button */}
             <button
-              onClick={goPrev}
+              onClick={goPrevManual}
               className="absolute left-1 sm:left-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
               aria-label="Предыдущее"
             >
@@ -196,7 +257,11 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
                 doubleClick={{ mode: "toggle", step: 2 }}
                 pinch={{ step: 30 }}
                 wheel={{ step: 0.8, smoothStep: 0.01 }}
-                panning={{ velocityDisabled: false }}
+                panning={{ disabled: true }}
+                onTransformed={(_ref, state) => {
+                  if (state.scale > 1) setPaused(true);
+                  else setPaused(false);
+                }}
               >
                 <TransformComponent
                   wrapperStyle={{ width: "100%", height: "100%" }}
@@ -207,7 +272,7 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
                     alt={activeAlbum.photos[carouselIndex].alt}
                     fill
                     className="object-contain"
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 90vw, 70vw"
                     priority
                     draggable={false}
                   />
@@ -217,7 +282,7 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
 
             {/* Next button */}
             <button
-              onClick={goNext}
+              onClick={goNextManual}
               className="absolute right-1 sm:right-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
               aria-label="Следующее"
             >
@@ -242,7 +307,7 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
               {activeAlbum.photos.map((photo, i) => (
                 <button
                   key={photo.id}
-                  onClick={() => setCarouselIndex(i)}
+                  onClick={() => goToManual(i)}
                   className={`relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden transition-all ${
                     i === carouselIndex
                       ? "ring-2 ring-accent opacity-100"

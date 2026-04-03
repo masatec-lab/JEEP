@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MessengerWidgetWrapper from "@/components/MessengerWidgetWrapper";
+import ScrollToTop from "@/components/ScrollToTop";
 import ThemeProvider from "@/components/ThemeProvider";
 import { getContacts } from "@/lib/data";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default async function RootLayout({
           <Header contacts={contacts} />
           {children}
           <Footer contacts={contacts} />
+          <ScrollToTop />
           <MessengerWidgetWrapper contacts={contacts} />
         </ThemeProvider>
       </body>
