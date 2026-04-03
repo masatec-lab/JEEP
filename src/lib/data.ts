@@ -17,6 +17,7 @@ export interface RouteData {
   image: string;
   gallery: string[];
   startPoint: string;
+  startPoints: { name: string; extraPrice: number }[];
   extraHourPrice: number;
   maxExtraHours: number;
   popular: boolean;
@@ -25,6 +26,7 @@ export interface RouteData {
 
 function parseRoute(raw: {
   highlights: string;
+  startPoints: string;
   included: string;
   gallery: string;
   difficulty: number;
@@ -36,6 +38,7 @@ function parseRoute(raw: {
     highlights: JSON.parse(raw.highlights || "[]"),
     included: JSON.parse(raw.included || "[]"),
     gallery: JSON.parse(raw.gallery || "[]"),
+    startPoints: JSON.parse(raw.startPoints || "[]"),
   } as RouteData;
 }
 

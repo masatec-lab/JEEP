@@ -9,65 +9,136 @@ interface RoutePhoto {
   alt: string;
 }
 
-export function ExtraHoursCalc({
+interface StartPoint {
+  name: string;
+  extraPrice: number;
+}
+
+export function PriceCalc({
   basePrice,
   extraHourPrice,
   maxExtraHours,
   duration,
+  startPoints,
 }: {
   basePrice: number;
   extraHourPrice: number;
   maxExtraHours: number;
   duration: string;
+  startPoints: StartPoint[];
 }) {
+  const [selectedStart, setSelectedStart] = useState(0);
   const [extraHours, setExtraHours] = useState(0);
-  const total = basePrice + extraHourPrice * extraHours;
+
+  const startExtra = startPoints[selectedStart]?.extraPrice || 0;
+  const total = basePrice + startExtra + extraHourPrice * extraHours;
+  const hasOptions = startPoints.length > 1 || (extraHourPrice > 0 && maxExtraHours > 0);
+
+  if (!hasOptions && startPoints.length <= 1) return null;
 
   return (
-    <div className="border-t border-border pt-6 space-y-3">
-      <div className="text-sm font-medium text-text-primary">Продлить поездку</div>
-      <p className="text-xs text-text-muted">
-        +{extraHourPrice.toLocaleString("ru-RU")} ₽ за каждый дополнительный час
-      </p>
-
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => setExtraHours(Math.max(0, extraHours - 1))}
-          disabled={extraHours === 0}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
-          </svg>
-        </button>
-
-        <div className="flex-1 text-center">
-          <div className="text-lg font-bold text-text-primary">
-            {extraHours === 0 ? duration : `${duration} + ${extraHours} ч.`}
-          </div>
-          <div className="text-xs text-text-muted">
-            {extraHours === 0 ? "базовый маршрут" : `+${extraHours} доп. час${extraHours > 1 ? "а" : ""}`}
+    <div className="border-t border-border pt-6 space-y-4">
+      {/* Start point selection */}
+      {startPoints.length > 1 && (
+        <div>
+          <div className="text-sm font-medium text-text-primary mb-2">Точка старта</div>
+          <div className="space-y-2">
+            {startPoints.map((sp, i) => (
+              <label
+                key={i}
+                className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${
+                  selectedStart === i
+                    ? "border-accent bg-accent/5"
+                    : "border-border hover:border-accent/30"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                      selectedStart === i ? "border-accent" : "border-text-muted"
+                    }`}
+                  >
+                    {selectedStart === i && (
+                      <div className="h-2 w-2 rounded-full bg-accent" />
+                    )}
+                  </div>
+                  <span className="text-sm text-text-primary">{sp.name}</span>
+                </div>
+                <span className={`text-xs font-medium ${
+                  sp.extraPrice === 0 ? "text-green" : "text-accent"
+                }`}>
+                  {sp.extraPrice === 0 ? "базовая" : `+${sp.extraPrice.toLocaleString("ru-RU")} ₽`}
+                </span>
+              </label>
+            ))}
           </div>
         </div>
+      )}
 
-        <button
-          onClick={() => setExtraHours(Math.min(maxExtraHours, extraHours + 1))}
-          disabled={extraHours >= maxExtraHours}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </button>
-      </div>
+      {/* Extra hours */}
+      {extraHourPrice > 0 && maxExtraHours > 0 && (
+        <div>
+          <div className="text-sm font-medium text-text-primary mb-2">Продлить поездку</div>
+          <p className="text-xs text-text-muted mb-3">
+            +{extraHourPrice.toLocaleString("ru-RU")} ₽ за каждый доп. час
+          </p>
 
-      {extraHours > 0 && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setExtraHours(Math.max(0, extraHours - 1))}
+              disabled={extraHours === 0}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+              </svg>
+            </button>
+
+            <div className="flex-1 text-center">
+              <div className="text-sm font-bold text-text-primary">
+                {extraHours === 0 ? duration : `${duration} + ${extraHours} ч.`}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setExtraHours(Math.min(maxExtraHours, extraHours + 1))}
+              disabled={extraHours >= maxExtraHours}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Total */}
+      {(startExtra > 0 || extraHours > 0) && (
         <div className="rounded-lg bg-accent/10 border border-accent/20 p-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-text-secondary">Итого:</span>
-            <span className="text-xl font-bold text-accent">
-              {total.toLocaleString("ru-RU")} ₽
-            </span>
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-text-muted">
+              <span>Базовый маршрут</span>
+              <span>{basePrice.toLocaleString("ru-RU")} ₽</span>
+            </div>
+            {startExtra > 0 && (
+              <div className="flex justify-between text-xs text-text-muted">
+                <span>{startPoints[selectedStart].name}</span>
+                <span>+{startExtra.toLocaleString("ru-RU")} ₽</span>
+              </div>
+            )}
+            {extraHours > 0 && (
+              <div className="flex justify-between text-xs text-text-muted">
+                <span>+{extraHours} доп. час{extraHours > 1 ? "а" : ""}</span>
+                <span>+{(extraHourPrice * extraHours).toLocaleString("ru-RU")} ₽</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-2 border-t border-accent/20">
+              <span className="text-sm font-medium text-text-primary">Итого:</span>
+              <span className="text-xl font-bold text-accent">
+                {total.toLocaleString("ru-RU")} ₽
+              </span>
+            </div>
           </div>
         </div>
       )}

@@ -36,6 +36,7 @@ export default function EditRoutePage() {
           ...data,
           highlights: parseField(data.highlights),
           included: parseField(data.included),
+          startPoints: parseField(data.startPoints),
         });
       } else {
         setError("Маршрут не найден");

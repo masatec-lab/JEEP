@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getRouteBySlug, getRoutes, getContacts } from "@/lib/data";
 import JsonLd from "@/components/JsonLd";
-import { ExtraHoursCalc, RoutePhotoGallery } from "@/components/RoutePageClient";
+import { PriceCalc, RoutePhotoGallery } from "@/components/RoutePageClient";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -231,15 +231,14 @@ export default async function RoutePage({
                   </div>
                 </div>
 
-                {/* Extra hours calculator */}
-                {route.extraHourPrice > 0 && route.maxExtraHours > 0 && (
-                  <ExtraHoursCalc
-                    basePrice={route.price}
-                    extraHourPrice={route.extraHourPrice}
-                    maxExtraHours={route.maxExtraHours}
-                    duration={route.duration}
-                  />
-                )}
+                {/* Price calculator */}
+                <PriceCalc
+                  basePrice={route.price}
+                  extraHourPrice={route.extraHourPrice}
+                  maxExtraHours={route.maxExtraHours}
+                  duration={route.duration}
+                  startPoints={route.startPoints}
+                />
 
                 {/* CTA */}
                 <div className="space-y-3 border-t border-border pt-6">

@@ -20,6 +20,7 @@ interface RouteData {
   included: string[];
   image: string;
   startPoint: string;
+  startPoints: { name: string; extraPrice: number }[];
   extraHourPrice: number;
   maxExtraHours: number;
   popular: boolean;
@@ -71,6 +72,10 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
       included: ["Проезд на УАЗе", "Опытный водитель-инструктор"],
       image: "",
       startPoint: "пос. Каменномостский",
+      startPoints: [
+        { name: "пос. Каменномостский", extraPrice: 0 },
+        { name: "ст. Даховская", extraPrice: 1000 },
+      ],
       extraHourPrice: 1500,
       maxExtraHours: 2,
       popular: false,
@@ -175,6 +180,8 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
         ...form,
         highlights: form.highlights.filter((h) => h.trim()),
         included: form.included.filter((i) => i.trim()),
+        startPoints: form.startPoints.filter((sp) => sp.name.trim()),
+        startPoint: form.startPoints.find((sp) => sp.extraPrice === 0)?.name || form.startPoints[0]?.name || form.startPoint,
       };
 
       const res = await fetch(url, {
@@ -469,6 +476,77 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
             <button
               type="button"
               onClick={() => removeListItem("included", i)}
+              className="px-2 text-text-muted hover:text-terracotta transition-colors"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Start points */}
+      <div className="rounded-xl border border-border bg-bg-secondary p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-text-primary">Точки старта</h2>
+            <p className="text-xs text-text-muted">Первая точка с доплатой 0 ₽ — базовая</p>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setForm({
+                ...form,
+                startPoints: [...form.startPoints, { name: "", extraPrice: 0 }],
+              })
+            }
+            className="text-xs font-medium text-accent hover:text-accent-hover transition-colors"
+          >
+            + Добавить
+          </button>
+        </div>
+
+        {form.startPoints.map((sp, i) => (
+          <div key={i} className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={sp.name}
+              onChange={(e) => {
+                const updated = [...form.startPoints];
+                updated[i] = { ...updated[i], name: e.target.value };
+                setForm({ ...form, startPoints: updated });
+              }}
+              className="flex-1 rounded-lg border border-border bg-bg-primary py-2 px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
+              placeholder="пос. Каменномостский"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-text-muted">+</span>
+              <input
+                type="number"
+                value={sp.extraPrice}
+                onChange={(e) => {
+                  const updated = [...form.startPoints];
+                  updated[i] = { ...updated[i], extraPrice: parseInt(e.target.value) || 0 };
+                  setForm({ ...form, startPoints: updated });
+                }}
+                className="w-24 rounded-lg border border-border bg-bg-primary py-2 px-3 text-sm text-text-primary focus:border-accent focus:outline-none"
+                min="0"
+                step="500"
+              />
+              <span className="text-xs text-text-muted">₽</span>
+            </div>
+            {sp.extraPrice === 0 && (
+              <span className="text-[10px] font-medium text-green bg-green/10 rounded-full px-2 py-0.5">базовая</span>
+            )}
+            <button
+              type="button"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  startPoints: form.startPoints.filter((_, idx) => idx !== i),
+                })
+              }
               className="px-2 text-text-muted hover:text-terracotta transition-colors"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
