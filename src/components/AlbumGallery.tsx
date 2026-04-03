@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import SectionHeading from "./SectionHeading";
 
 interface Photo {
@@ -33,6 +34,7 @@ const gradients = [
 export default function AlbumGallery({ albums }: { albums: Album[] }) {
   const [activeAlbum, setActiveAlbum] = useState<Album | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const zoomRef = useRef<ReactZoomPanPinchRef>(null);
 
   const openAlbum = (album: Album) => {
     if (album.photos.length === 0) return;
@@ -45,19 +47,25 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
     setCarouselIndex(0);
   };
 
+  const resetZoom = useCallback(() => {
+    zoomRef.current?.resetTransform();
+  }, []);
+
   const goPrev = useCallback(() => {
     if (!activeAlbum) return;
+    resetZoom();
     setCarouselIndex((i) =>
       i === 0 ? activeAlbum.photos.length - 1 : i - 1
     );
-  }, [activeAlbum]);
+  }, [activeAlbum, resetZoom]);
 
   const goNext = useCallback(() => {
     if (!activeAlbum) return;
+    resetZoom();
     setCarouselIndex((i) =>
       i === activeAlbum.photos.length - 1 ? 0 : i + 1
     );
-  }, [activeAlbum]);
+  }, [activeAlbum, resetZoom]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -166,11 +174,11 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
           </div>
 
           {/* Main image */}
-          <div className="flex-1 flex items-center justify-center px-4 relative" onClick={(e) => e.stopPropagation()}>
+          <div className="flex-1 flex items-center justify-center px-2 sm:px-4 relative" onClick={(e) => e.stopPropagation()}>
             {/* Prev button */}
             <button
               onClick={goPrev}
-              className="absolute left-4 sm:left-8 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
+              className="absolute left-1 sm:left-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
               aria-label="Предыдущее"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -178,22 +186,39 @@ export default function AlbumGallery({ albums }: { albums: Album[] }) {
               </svg>
             </button>
 
-            {/* Image */}
-            <div className="relative w-full max-w-5xl aspect-video mx-16">
-              <Image
-                src={activeAlbum.photos[carouselIndex].image}
-                alt={activeAlbum.photos[carouselIndex].alt}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
+            {/* Image with pinch-to-zoom */}
+            <div className="relative w-full max-w-5xl aspect-[3/4] sm:aspect-video mx-10 sm:mx-16">
+              <TransformWrapper
+                ref={zoomRef}
+                initialScale={1}
+                minScale={1}
+                maxScale={5}
+                doubleClick={{ mode: "toggle", step: 2 }}
+                pinch={{ step: 30 }}
+                wheel={{ step: 0.8, smoothStep: 0.01 }}
+                panning={{ velocityDisabled: false }}
+              >
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{ width: "100%", height: "100%" }}
+                >
+                  <Image
+                    src={activeAlbum.photos[carouselIndex].image}
+                    alt={activeAlbum.photos[carouselIndex].alt}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                    draggable={false}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
             </div>
 
             {/* Next button */}
             <button
               onClick={goNext}
-              className="absolute right-4 sm:right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
+              className="absolute right-1 sm:right-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
               aria-label="Следующее"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>

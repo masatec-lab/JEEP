@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 
 interface RoutePhoto {
   id: string;
@@ -150,6 +151,11 @@ export function PriceCalc({
 
 export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const zoomRef = useRef<ReactZoomPanPinchRef>(null);
+
+  const resetZoom = useCallback(() => {
+    zoomRef.current?.resetTransform();
+  }, []);
 
   if (photos.length === 0) return null;
 
@@ -194,28 +200,45 @@ export function RoutePhotoGallery({ photos }: { photos: RoutePhoto[] }) {
 
           <div className="flex-1 flex items-center justify-center px-4 relative" onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setLightboxIndex(lightboxIndex === 0 ? photos.length - 1 : lightboxIndex - 1)}
-              className="absolute left-4 sm:left-8 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
+              onClick={() => { resetZoom(); setLightboxIndex(lightboxIndex === 0 ? photos.length - 1 : lightboxIndex - 1); }}
+              className="absolute left-1 sm:left-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
               </svg>
             </button>
 
-            <div className="relative w-full max-w-5xl aspect-video mx-16">
-              <Image
-                src={photos[lightboxIndex].image}
-                alt={photos[lightboxIndex].alt}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
+            <div className="relative w-full max-w-5xl aspect-[3/4] sm:aspect-video mx-10 sm:mx-16">
+              <TransformWrapper
+                ref={zoomRef}
+                initialScale={1}
+                minScale={1}
+                maxScale={5}
+                doubleClick={{ mode: "toggle", step: 2 }}
+                pinch={{ step: 30 }}
+                wheel={{ step: 0.8, smoothStep: 0.01 }}
+                panning={{ velocityDisabled: false }}
+              >
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{ width: "100%", height: "100%" }}
+                >
+                  <Image
+                    src={photos[lightboxIndex].image}
+                    alt={photos[lightboxIndex].alt}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                    draggable={false}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
             </div>
 
             <button
-              onClick={() => setLightboxIndex(lightboxIndex === photos.length - 1 ? 0 : lightboxIndex + 1)}
-              className="absolute right-4 sm:right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
+              onClick={() => { resetZoom(); setLightboxIndex(lightboxIndex === photos.length - 1 ? 0 : lightboxIndex + 1); }}
+              className="absolute right-1 sm:right-8 z-10 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-colors"
             >
               <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
