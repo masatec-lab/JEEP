@@ -44,9 +44,11 @@ export function PriceCalc({
           <div className="text-sm font-medium text-text-primary mb-2">Точка старта</div>
           <div className="space-y-2">
             {startPoints.map((sp, i) => (
-              <label
+              <button
+                type="button"
                 key={i}
-                className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${
+                onClick={() => setSelectedStart(i)}
+                className={`flex w-full items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors text-left ${
                   selectedStart === i
                     ? "border-accent bg-accent/5"
                     : "border-border hover:border-accent/30"
@@ -54,7 +56,7 @@ export function PriceCalc({
               >
                 <div className="flex items-center gap-2">
                   <div
-                    className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                    className={`h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       selectedStart === i ? "border-accent" : "border-text-muted"
                     }`}
                   >
@@ -69,7 +71,7 @@ export function PriceCalc({
                 }`}>
                   {sp.extraPrice === 0 ? "базовая" : `+${sp.extraPrice.toLocaleString("ru-RU")} ₽`}
                 </span>
-              </label>
+              </button>
             ))}
           </div>
         </div>
