@@ -37,6 +37,9 @@ export default function EditRoutePage() {
           highlights: parseField(data.highlights),
           included: parseField(data.included),
           startPoints: parseField(data.startPoints),
+          hunterEnabled: data.hunterEnabled ?? true,
+          patriotEnabled: data.patriotEnabled ?? false,
+          pricePatriot: data.pricePatriot ?? 0,
         });
       } else {
         setError("Маршрут не найден");

@@ -21,6 +21,9 @@ interface RouteData {
   image: string;
   startPoint: string;
   startPoints: { name: string; extraPrice: number }[];
+  hunterEnabled: boolean;
+  patriotEnabled: boolean;
+  pricePatriot: number;
   extraHourPrice: number;
   maxExtraHours: number;
   popular: boolean;
@@ -76,6 +79,9 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
         { name: "пос. Каменномостский", extraPrice: 0 },
         { name: "ст. Даховская", extraPrice: 1000 },
       ],
+      hunterEnabled: true,
+      patriotEnabled: false,
+      pricePatriot: 12000,
       extraHourPrice: 1500,
       maxExtraHours: 2,
       popular: false,
@@ -281,39 +287,79 @@ export default function RouteForm({ initial }: { initial?: RouteData }) {
         </div>
       </div>
 
-      {/* Pricing & details */}
+      {/* Vehicle prices */}
       <div className="rounded-xl border border-border bg-bg-secondary p-6 space-y-5">
-        <h2 className="text-lg font-semibold text-text-primary">
-          Цена и параметры
-        </h2>
+        <h2 className="text-lg font-semibold text-text-primary">Машины и цены</h2>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-          <div>
-            <label className="block text-sm font-medium text-text-secondary">
-              Цена (₽) *
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className={`rounded-lg border p-4 transition-opacity ${
+            form.hunterEnabled ? "border-accent/30 bg-bg-primary" : "border-border bg-bg-primary opacity-50"
+          }`}>
+            <label className="flex items-center gap-2 mb-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="hunterEnabled"
+                checked={form.hunterEnabled}
+                onChange={handleChange}
+                className="h-4 w-4 rounded accent-accent"
+              />
+              <span className="text-sm font-semibold text-text-primary">УАЗ Хантер</span>
+              <span className="text-xs text-text-muted bg-bg-tertiary rounded-full px-2 py-0.5">до 6 чел.</span>
             </label>
+            <label className="block text-sm font-medium text-text-secondary">Цена (₽)</label>
             <input
               type="number"
               name="price"
-              required
               value={form.price}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
+              className="mt-1.5 w-full rounded-lg border border-border bg-bg-secondary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-text-secondary">
-              Примечание к цене
+          <div className={`rounded-lg border p-4 transition-opacity ${
+            form.patriotEnabled ? "border-accent/30 bg-bg-primary" : "border-border bg-bg-primary opacity-50"
+          }`}>
+            <label className="flex items-center gap-2 mb-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="patriotEnabled"
+                checked={form.patriotEnabled}
+                onChange={handleChange}
+                className="h-4 w-4 rounded accent-accent"
+              />
+              <span className="text-sm font-semibold text-text-primary">УАЗ Патриот</span>
+              <span className="text-xs text-text-muted bg-bg-tertiary rounded-full px-2 py-0.5">до 8 чел.</span>
             </label>
+            <label className="block text-sm font-medium text-text-secondary">Цена (₽)</label>
             <input
-              type="text"
-              name="priceNote"
-              value={form.priceNote}
+              type="number"
+              name="pricePatriot"
+              value={form.pricePatriot}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
+              className="mt-1.5 w-full rounded-lg border border-border bg-bg-secondary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-text-secondary">
+            Примечание к цене
+          </label>
+          <input
+            type="text"
+            name="priceNote"
+            value={form.priceNote}
+            onChange={handleChange}
+            className="mt-1.5 w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3.5 text-sm text-text-primary focus:border-accent focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Route details */}
+      <div className="rounded-xl border border-border bg-bg-secondary p-6 space-y-5">
+        <h2 className="text-lg font-semibold text-text-primary">Параметры</h2>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
 
           <div>
             <label className="block text-sm font-medium text-text-secondary">

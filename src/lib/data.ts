@@ -18,6 +18,9 @@ export interface RouteData {
   gallery: string[];
   startPoint: string;
   startPoints: { name: string; extraPrice: number }[];
+  hunterEnabled: boolean;
+  patriotEnabled: boolean;
+  pricePatriot: number;
   extraHourPrice: number;
   maxExtraHours: number;
   popular: boolean;

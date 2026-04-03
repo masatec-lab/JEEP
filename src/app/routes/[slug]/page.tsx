@@ -136,6 +136,9 @@ export default async function RoutePage({
           <div className="mt-4">
             <PriceCalc
               basePrice={route.price}
+              pricePatriot={route.pricePatriot}
+              hunterEnabled={route.hunterEnabled}
+              patriotEnabled={route.patriotEnabled}
               extraHourPrice={route.extraHourPrice}
               maxExtraHours={route.maxExtraHours}
               duration={route.duration}
@@ -266,6 +269,9 @@ export default async function RoutePage({
                     {/* Price calculator */}
                     <PriceCalc
                       basePrice={route.price}
+                      pricePatriot={route.pricePatriot}
+                      hunterEnabled={route.hunterEnabled}
+                      patriotEnabled={route.patriotEnabled}
                       extraHourPrice={route.extraHourPrice}
                       maxExtraHours={route.maxExtraHours}
                       duration={route.duration}

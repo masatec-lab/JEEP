@@ -34,6 +34,9 @@ model Route {
   gallery          String
   startPoint       String
   startPoints      String   @default("[]")
+  hunterEnabled    Boolean  @default(true)
+  patriotEnabled   Boolean  @default(false)
+  pricePatriot     Int      @default(0)
   extraHourPrice   Int      @default(0)
   maxExtraHours    Int      @default(0)
   popular          Boolean  @default(false)

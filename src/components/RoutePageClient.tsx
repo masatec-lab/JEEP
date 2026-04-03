@@ -15,42 +15,58 @@ interface StartPoint {
   extraPrice: number;
 }
 
+interface Vehicle {
+  name: string;
+  seats: number;
+  price: number;
+}
+
 export function PriceCalc({
   basePrice,
+  pricePatriot,
+  hunterEnabled,
+  patriotEnabled,
   extraHourPrice,
   maxExtraHours,
   duration,
   startPoints,
 }: {
   basePrice: number;
+  pricePatriot: number;
+  hunterEnabled: boolean;
+  patriotEnabled: boolean;
   extraHourPrice: number;
   maxExtraHours: number;
   duration: string;
   startPoints: StartPoint[];
 }) {
+  const vehicles: Vehicle[] = [
+    ...(hunterEnabled ? [{ name: "УАЗ Хантер", seats: 6, price: basePrice }] : []),
+    ...(patriotEnabled && pricePatriot > 0 ? [{ name: "УАЗ Патриот", seats: 8, price: pricePatriot }] : []),
+  ];
+
+  const [selectedVehicle, setSelectedVehicle] = useState(0);
   const [selectedStart, setSelectedStart] = useState(0);
   const [extraHours, setExtraHours] = useState(0);
 
+  const vehiclePrice = vehicles[selectedVehicle]?.price || basePrice;
   const startExtra = startPoints[selectedStart]?.extraPrice || 0;
-  const total = basePrice + startExtra + extraHourPrice * extraHours;
-  const hasOptions = startPoints.length > 1 || (extraHourPrice > 0 && maxExtraHours > 0);
-
-  if (!hasOptions && startPoints.length <= 1) return null;
+  const total = vehiclePrice + startExtra + extraHourPrice * extraHours;
 
   return (
     <div className="border-t border-border pt-6 space-y-4">
-      {/* Start point selection */}
-      {startPoints.length > 1 && (
+      {/* Vehicle selection */}
+      {vehicles.length > 1 && (
         <div>
-          <div className="text-sm font-medium text-text-primary mb-2">Точка старта</div>
+          <div className="text-sm font-medium text-text-primary mb-2">Выберите машину</div>
           <div className="space-y-2">
-            {startPoints.map((sp, i) => (
+            {vehicles.map((v, i) => (
               <button
                 type="button"
                 key={i}
-                onClick={() => setSelectedStart(i)}
+                onClick={() => setSelectedVehicle(i)}
                 className={`flex w-full items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors text-left ${
-                  selectedStart === i
+                  selectedVehicle === i
                     ? "border-accent bg-accent/5"
                     : "border-border hover:border-accent/30"
                 }`}
@@ -58,23 +74,70 @@ export function PriceCalc({
                 <div className="flex items-center gap-2">
                   <div
                     className={`h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      selectedStart === i ? "border-accent" : "border-text-muted"
+                      selectedVehicle === i ? "border-accent" : "border-text-muted"
                     }`}
                   >
-                    {selectedStart === i && (
+                    {selectedVehicle === i && (
                       <div className="h-2 w-2 rounded-full bg-accent" />
                     )}
                   </div>
-                  <span className="text-sm text-text-primary">{sp.name}</span>
+                  <div>
+                    <span className="text-sm text-text-primary">{v.name}</span>
+                    <span className="ml-2 text-xs text-text-muted">до {v.seats} чел.</span>
+                  </div>
                 </div>
-                <span className={`text-xs font-medium ${
-                  sp.extraPrice === 0 ? "text-green" : "text-accent"
-                }`}>
-                  {sp.extraPrice === 0 ? "базовая" : `+${sp.extraPrice.toLocaleString("ru-RU")} ₽`}
+                <span className="text-sm font-semibold text-accent">
+                  {v.price.toLocaleString("ru-RU")} ₽
                 </span>
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Start point selection */}
+      {startPoints.length > 0 && (
+        <div>
+          <div className="text-sm font-medium text-text-primary mb-2">Точка старта</div>
+          {startPoints.length === 1 ? (
+            <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 flex items-center justify-between">
+              <span className="text-sm text-text-primary">{startPoints[0].name}</span>
+              <span className="text-xs font-medium text-green">базовая</span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {startPoints.map((sp, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setSelectedStart(i)}
+                  className={`flex w-full items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors text-left ${
+                    selectedStart === i
+                      ? "border-accent bg-accent/5"
+                      : "border-border hover:border-accent/30"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        selectedStart === i ? "border-accent" : "border-text-muted"
+                      }`}
+                    >
+                      {selectedStart === i && (
+                        <div className="h-2 w-2 rounded-full bg-accent" />
+                      )}
+                    </div>
+                    <span className="text-sm text-text-primary">{sp.name}</span>
+                  </div>
+                  <span className={`text-xs font-medium ${
+                    sp.extraPrice === 0 ? "text-green" : "text-accent"
+                  }`}>
+                    {sp.extraPrice === 0 ? "базовая" : `+${sp.extraPrice.toLocaleString("ru-RU")} ₽`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -117,12 +180,12 @@ export function PriceCalc({
       )}
 
       {/* Total */}
-      {(startExtra > 0 || extraHours > 0) && (
+      {(vehicles.length > 1 || startPoints.length > 1 || startExtra > 0 || extraHours > 0) && (
         <div className="rounded-lg bg-accent/10 border border-accent/20 p-3">
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-text-muted">
-              <span>Базовый маршрут</span>
-              <span>{basePrice.toLocaleString("ru-RU")} ₽</span>
+              <span>{vehicles[selectedVehicle]?.name || "Маршрут"}</span>
+              <span>{vehiclePrice.toLocaleString("ru-RU")} ₽</span>
             </div>
             {startExtra > 0 && (
               <div className="flex justify-between text-xs text-text-muted">
