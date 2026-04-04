@@ -135,6 +135,7 @@ export default async function RoutePage({
           </div>
           <div className="mt-4">
             <PriceCalc
+              routeName={route.name}
               basePrice={route.price}
               pricePatriot={route.pricePatriot}
               hunterEnabled={route.hunterEnabled}
@@ -268,6 +269,7 @@ export default async function RoutePage({
 
                     {/* Price calculator */}
                     <PriceCalc
+                      routeName={route.name}
                       basePrice={route.price}
                       pricePatriot={route.pricePatriot}
                       hunterEnabled={route.hunterEnabled}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface RouteOption {
   id: string;
@@ -15,6 +16,8 @@ export default function ContactsClient({
   contacts: Record<string, string>;
   routes: RouteOption[];
 }) {
+  const searchParams = useSearchParams();
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -23,6 +26,31 @@ export default function ContactsClient({
     guests: "",
     message: "",
   });
+
+  // Pre-fill from URL params (from sidebar booking button)
+  useEffect(() => {
+    const route = searchParams.get("route");
+    const vehicle = searchParams.get("vehicle");
+    const start = searchParams.get("start");
+    const date = searchParams.get("date");
+    const time = searchParams.get("time");
+    const total = searchParams.get("total");
+
+    if (route || date) {
+      const parts: string[] = [];
+      if (vehicle) parts.push(`Машина: ${vehicle}`);
+      if (start) parts.push(`Старт: ${start}`);
+      if (time) parts.push(`Время: ${time}`);
+      if (total) parts.push(`Итого: ${parseInt(total).toLocaleString("ru-RU")} ₽`);
+
+      setFormData((prev) => ({
+        ...prev,
+        route: route || prev.route,
+        date: date || prev.date,
+        message: parts.length > 0 ? parts.join("\n") : prev.message,
+      }));
+    }
+  }, [searchParams]);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {

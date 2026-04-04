@@ -22,6 +22,7 @@ interface Vehicle {
 }
 
 export function PriceCalc({
+  routeName,
   basePrice,
   pricePatriot,
   hunterEnabled,
@@ -31,6 +32,7 @@ export function PriceCalc({
   duration,
   startPoints,
 }: {
+  routeName: string;
   basePrice: number;
   pricePatriot: number;
   hunterEnabled: boolean;
@@ -48,6 +50,8 @@ export function PriceCalc({
   const [selectedVehicle, setSelectedVehicle] = useState(0);
   const [selectedStart, setSelectedStart] = useState(0);
   const [extraHours, setExtraHours] = useState(0);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("09:00");
 
   const vehiclePrice = vehicles[selectedVehicle]?.price || basePrice;
   const startExtra = startPoints[selectedStart]?.extraPrice || 0;
@@ -179,6 +183,41 @@ export function PriceCalc({
         </div>
       )}
 
+      {/* Date & time */}
+      <div>
+        <div className="text-sm font-medium text-text-primary mb-2">Дата и время</div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className="w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3 text-sm text-text-primary focus:border-accent focus:outline-none transition-colors"
+            />
+          </div>
+          <div>
+            <select
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3 text-sm text-text-primary focus:border-accent focus:outline-none transition-colors cursor-pointer"
+            >
+              <option value="08:00">08:00</option>
+              <option value="09:00">09:00</option>
+              <option value="10:00">10:00</option>
+              <option value="11:00">11:00</option>
+              <option value="12:00">12:00</option>
+              <option value="13:00">13:00</option>
+              <option value="14:00">14:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
+              <option value="17:00">17:00</option>
+              <option value="18:00">18:00</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Total */}
       {(vehicles.length > 1 || startPoints.length > 1 || startExtra > 0 || extraHours > 0) && (
         <div className="rounded-lg bg-accent/10 border border-accent/20 p-3">
@@ -207,6 +246,23 @@ export function PriceCalc({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Booking button with pre-filled data */}
+      {selectedDate && (
+        <a
+          href={`/contacts?${new URLSearchParams({
+            route: routeName,
+            vehicle: vehicles[selectedVehicle]?.name || "",
+            start: startPoints[selectedStart]?.name || "",
+            date: selectedDate,
+            time: selectedTime,
+            total: total.toString(),
+          }).toString()}#booking`}
+          className="block w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-bg-primary hover:bg-accent-hover transition-colors"
+        >
+          Забронировать на {new Date(selectedDate + "T00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "short" })} в {selectedTime}
+        </a>
       )}
     </div>
   );
