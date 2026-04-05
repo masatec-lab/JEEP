@@ -135,6 +135,7 @@ export default async function RoutePage({
           </div>
           <div className="mt-4">
             <PriceCalc
+              instanceId="mobile"
               routeName={route.name}
               basePrice={route.price}
               pricePatriot={route.pricePatriot}
@@ -269,6 +270,7 @@ export default async function RoutePage({
 
                     {/* Price calculator */}
                     <PriceCalc
+                      instanceId="desktop"
                       routeName={route.name}
                       basePrice={route.price}
                       pricePatriot={route.pricePatriot}

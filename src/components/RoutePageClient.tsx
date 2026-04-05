@@ -22,6 +22,7 @@ interface Vehicle {
 }
 
 export function PriceCalc({
+  instanceId = "default",
   routeName,
   basePrice,
   pricePatriot,
@@ -32,6 +33,7 @@ export function PriceCalc({
   duration,
   startPoints,
 }: {
+  instanceId?: string;
   routeName: string;
   basePrice: number;
   pricePatriot: number;
@@ -190,6 +192,8 @@ export function PriceCalc({
           <div>
             <input
               type="date"
+              id={`booking-date-${instanceId}`}
+              name={`booking-date-${instanceId}`}
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
@@ -198,6 +202,8 @@ export function PriceCalc({
           </div>
           <div>
             <select
+              id={`booking-time-${instanceId}`}
+              name={`booking-time-${instanceId}`}
               value={selectedTime}
               onChange={(e) => setSelectedTime(e.target.value)}
               className="w-full rounded-lg border border-border bg-bg-primary py-2.5 px-3 text-sm text-text-primary focus:border-accent focus:outline-none transition-colors cursor-pointer"
