@@ -196,6 +196,7 @@ export default function ContactsClient({
                       <div>
                         <label htmlFor="date" className="block text-sm font-medium text-text-secondary">Желаемая дата</label>
                         <input type="date" id="date" name="date" value={formData.date} onChange={handleChange}
+                          min={new Date().toISOString().split("T")[0]}
                           className="mt-2 w-full rounded-lg border border-border bg-bg-primary py-3 px-4 text-sm text-text-primary focus:border-accent focus:outline-none transition-colors" />
                       </div>
                       <div className="sm:col-span-2">

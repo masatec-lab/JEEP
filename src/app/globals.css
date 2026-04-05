@@ -100,3 +100,31 @@ html[data-scroll-behavior="smooth"] {
   background: var(--color-accent);
   color: var(--color-bg-primary);
 }
+
+/* Date/time inputs — match dark theme */
+:root {
+  color-scheme: dark;
+}
+
+html.light,
+html.light-admin {
+  color-scheme: light;
+}
+
+input[type="date"],
+input[type="time"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
