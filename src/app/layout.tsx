@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MessengerWidgetWrapper from "@/components/MessengerWidgetWrapper";
@@ -52,11 +53,9 @@ export default async function RootLayout({
   return (
     <html lang="ru" className={`${montserrat.variable} h-full antialiased`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){var p=window.location.pathname;document.documentElement.classList.add(p.startsWith('/admin')?'light-admin':'light')}}catch(e){}})()`,
-          }}
-        />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`(function(){try{var t=localStorage.getItem('theme');if(t==='light'){var p=window.location.pathname;document.documentElement.classList.add(p.startsWith('/admin')?'light-admin':'light')}}catch(e){}})()`}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
