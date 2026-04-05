@@ -17,7 +17,7 @@ export async function PUT(
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
-  await params; // validate params exist
+  const { id } = await params;
   const data: { photoIds: string[] } = await req.json();
 
   for (let i = 0; i < data.photoIds.length; i++) {
@@ -25,6 +25,19 @@ export async function PUT(
       where: { id: data.photoIds[i] },
       data: { order: i + 1 },
     });
+  }
+
+  // First photo becomes album cover
+  if (data.photoIds.length > 0) {
+    const firstPhoto = await prisma.galleryItem.findUnique({
+      where: { id: data.photoIds[0] },
+    });
+    if (firstPhoto) {
+      await prisma.album.update({
+        where: { id },
+        data: { coverImage: firstPhoto.image },
+      });
+    }
   }
 
   return NextResponse.json({ ok: true });

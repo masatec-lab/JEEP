@@ -209,7 +209,8 @@ export default function EditAlbumPage() {
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
 
-    setAlbum({ ...album, photos: reordered });
+    // First photo = cover
+    setAlbum({ ...album, photos: reordered, coverImage: reordered[0].image });
 
     await fetch(`/api/admin/albums/${album.id}/reorder`, {
       method: "PUT",
